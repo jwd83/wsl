@@ -1,2 +1,2 @@
-# wsl
-Windows Subsystem for Linux Notes
+# WSL Notes
+## Windows Subsystem for Linux Notes
