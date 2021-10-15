@@ -1,6 +1,8 @@
-$wsl_base_dir = '~/wsl/'
+$wsl_base_dir = 'C:\Users\jared\wsl\'
 $wslman_path = $PSCommandPath
 $u20 = 'https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64-wsl.rootfs.tar.gz'
+$cmd = $args[0]
+$var1 = $args[1]
 
 function main () {
     $ver = version
@@ -19,31 +21,52 @@ function main () {
     } else {
         "Entering $wsl_base_dir"
         
-        Set-Location ~/wsl
+        Set-Location $wsl_base_dir
 
-        $cmd = $args[0]
-
+        # check which command was passed
         if($cmd -eq 'create') {
-            "Creating a new WSL enviornment"
-            if($args[1] -eq 'u20') {
-                "Downloading ubuntu 20.04 (focal) latest"
-                download($u20, $wsl_base_dir)
-                "Downloading complete"
-            }
+            create
         }
+
+        if($cmd -eq 'clean') {
+            clean
+        }
+
     }
 }
 
-function download($url, $local) {
+function clean() {
+    Remove-Item *.tar.gz
+}
+
+function create() {
+    "Creating a new WSL enviornment"
+            
+    $download_link = ''
+    $local_filename = ''
+
+    if($var1 -eq 'u20') {
+        $download_link = $u20
+        $local_filename = 'ubuntu.focal.tar.gz'
+    }
+
+    if(-Not ($download_link -eq '')) {
+        download $download_link $local_filename
+    }
+}
+
+function download($dl_url, $dl_file) {
     $client = New-Object System.Net.WebClient
-    $client.DownloadFile('', $local)
+
+    $dl_local_path = $wsl_base_dir + $dl_file
+    "DOWNLOAD $dl_url TO $dl_local_path"
+
+    $client.DownloadFile($dl_url, $dl_local_path)
 }
 
 function version() {
     $versionInfo = Get-FileHash -Algorithm SHA256 -Path $wslman_path
     return $versionInfo.Hash
 }
-
-
 
 main
